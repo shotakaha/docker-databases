@@ -1,6 +1,7 @@
 services:
   db:
-    image: mariadb:10.11
+    image: mariadb:10.11    
+    working_dir: /workspace
     environment:
       MYSQL_ROOT_PASSWORD: rootpass
       MYSQL_DATABASE: testdb

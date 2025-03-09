@@ -30,6 +30,16 @@ $ docker compose exec db mariadb --version
 mariadb  Ver 15.1 Distrib 10.11.11-MariaDB, for debian-linux-gnu (aarch64) using  EditLine wrapper
 ```
 
+## 作業パスの確認
+
+```console
+$ docker compose exec db pwd
+/workspace
+```
+
+`working_dir`で作業パスを変更できます。
+デフォルトは`/`（ルートディレクトリ）です。
+
 ## シェル起動
 
 ```console
