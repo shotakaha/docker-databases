@@ -46,6 +46,16 @@ $ docker compose down
  ✔ Network docker-mariadb_default  Removed
 ```
 
+```console
+$ docker compose down -v
+[+] Running 3/3
+ ✔ Container docker-mariadb-db-1   Removed
+ ✔ Volume docker-mariadb_db_data   Removed
+ ✔ Network docker-mariadb_default  Removed
+```
+
+`-v`オプションでボリュームも削除できます。
+
 ## コンテナの確認
 
 ```console
