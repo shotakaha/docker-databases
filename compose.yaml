@@ -6,7 +6,7 @@ services:
       MYSQL_ROOT_PASSWORD: rootpass
       MYSQL_DATABASE: testdb
       MYSQL_USER: testuser
-      MYSQL_PASSWORD: testpassword
+      MYSQL_PASSWORD: testpass
     volumes:
       - db_data:/var/lib/mysql
 volumes:

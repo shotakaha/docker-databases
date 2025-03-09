@@ -23,12 +23,18 @@ docker compose up -d
  ✔ Container docker-mariadb-db-1   Started
 ```
 
+`docker compose up`でコンテナを起動します。
+このとき`-d`オプション（デタチモード）をつけます。
+
 ## バージョン確認
 
 ```console
 $ docker compose exec db mariadb --version
 mariadb  Ver 15.1 Distrib 10.11.11-MariaDB, for debian-linux-gnu (aarch64) using  EditLine wrapper
 ```
+
+`docker compose exec`で`mariadb --version`を実行し、バージョンを確認します。
+コンテナ名は`services`で設定した値（`db`）を指定しています。
 
 ## 作業パスの確認
 
@@ -37,14 +43,15 @@ $ docker compose exec db pwd
 /workspace
 ```
 
-`working_dir`で作業パスを変更できます。
+`pwd`を実行し、作業パスを確認します。
+作業パスは、`services.working_dir`で変更できます。
 デフォルトは`/`（ルートディレクトリ）です。
 
 ## シェル起動
 
 ```console
 $ docker compose exec db bash
-root@8e49936894e2:/# 
+root@8e49936894e2:/workspace# 
 ```
 
 ## 終了
@@ -84,7 +91,7 @@ local     docker-mariadb_db_data
 
 ```console
 $ docker compose exec db bash
-root@9ec9772778e2:/# mariadb --user=testuser --database=testdb -p
+root@9ec9772778e2:/workspace# mariadb --user=testuser --database=testdb -p
 Enter password:  // testpassword
 Welcome to the MariaDB monitor.  Commands end with ; or \g.
 Your MariaDB connection id is 3
@@ -106,10 +113,17 @@ MariaDB [testdb]>
 
 ```console
 $ docker compose exec db bash
-root@e8f060e53c00:/# mariadb-dump --print-defaults
+root@e8f060e53c00:/workspace# mariadb-dump --print-defaults
 mariadb-dump would have been started with the following arguments:
 --socket=/run/mysqld/mysqld.sock 
+
+root@e8f060e53c00:/workspace# mysql --user testuser -p testdb > backup.sql
+Enter password: // testpass
+root@e8f060e53c00:/workspace# exit
+
+$ docker compose cp db:/workspace/backup.sql .
 ```
 
-`mariadb-dump`もしくは`mysqldump`を使って、
-データベースをダンプします。
+`mariadb-dump`もしくは`mysqldump`を使って、データベースをダンプします。
+上記のサンプルでは、作業パスにバックアップを作成し、
+`docker compose cp`でホストに転送しています。
