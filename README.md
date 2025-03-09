@@ -64,8 +64,8 @@ local     docker-mariadb_db_data
 
 ```console
 $ docker compose exec db bash
-root@9ec9772778e2:/# mariadb --user=user --database=mydb -p
-Enter password: 
+root@9ec9772778e2:/# mariadb --user=testuser --database=testdb -p
+Enter password:  // testpassword
 Welcome to the MariaDB monitor.  Commands end with ; or \g.
 Your MariaDB connection id is 3
 Server version: 10.11.11-MariaDB-ubu2204 mariadb.org binary distribution
@@ -74,7 +74,7 @@ Copyright (c) 2000, 2018, Oracle, MariaDB Corporation Ab and others.
 
 Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
 
-MariaDB [mydb]> 
+MariaDB [testdb]> 
 ```
 
 コンテナのシェルを起動し、`mariadb`コマンドを実行する。
