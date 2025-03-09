@@ -91,3 +91,15 @@ MariaDB [testdb]>
 `--user=ユーザー名`に`MARIADB_USER`、
 `--database=データベース`に`MARIADB_DATABASE`の値を指定します。
 パスワードは`MARIADB_PASSWORD`を入力します。
+
+## データベースのバックアップ
+
+```console
+$ docker compose exec db bash
+root@e8f060e53c00:/# mariadb-dump --print-defaults
+mariadb-dump would have been started with the following arguments:
+--socket=/run/mysqld/mysqld.sock 
+```
+
+`mariadb-dump`もしくは`mysqldump`を使って、
+データベースをダンプします。
