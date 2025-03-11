@@ -26,16 +26,6 @@ docker compose up -d
 `docker compose up`でコンテナを起動します。
 このとき`-d`オプション（デタチモード）をつけます。
 
-## バージョン確認
-
-```console
-$ docker compose exec db mariadb --version
-mariadb  Ver 15.1 Distrib 10.11.11-MariaDB, for debian-linux-gnu (aarch64) using  EditLine wrapper
-```
-
-`docker compose exec`で`mariadb --version`を実行し、バージョンを確認します。
-コンテナ名は`services`で設定した値（`db`）を指定しています。
-
 ## 作業パスの確認
 
 ```console
@@ -53,6 +43,22 @@ $ docker compose exec db pwd
 $ docker compose exec db bash
 root@8e49936894e2:/workspace# 
 ```
+
+## バージョン確認
+
+```console
+root@e6c5df337cd7:/workspace# mariadb --version
+mariadb  Ver 15.1 Distrib 10.11.11-MariaDB, for debian-linux-gnu (aarch64) using  EditLine wrapper
+```
+
+コンテナのシェルの中で`mariadb --version`を実行し、バージョンを確認します。
+
+```console
+root@e6c5df337cd7:/workspace# mysql --version
+mysql  Ver 15.1 Distrib 10.11.11-MariaDB, for debian-linux-gnu (aarch64) using  EditLine wrapper
+```
+
+`mysql`コマンドもありました。中身はMariaDBでした。
 
 ## 終了
 
