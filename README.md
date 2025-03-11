@@ -8,10 +8,27 @@ docker compose mariadb
 
 ## 環境変数
 
-- `MARIADB_ROOT_PASSWORD` : ルートユーザーのパスワード
-- `MARIADB_DATABASE` : データベース名
-- `MARIADB_USER` : データベースのユーザー名
-- `MARIADB_PASSWORD` : データベースのパスワード
+| MySQL | MariaDB | 説明 | デフォルト値 |
+|---|---|---|---|
+| `MYSQL_ROOT_PASSWORD` | `MARIADB_ROOT_PASSWORD` | ルートユーザーのパスワード | なし（必須） |
+| `MYSQL_ALLOW_EMPTY_PASSWORD` | `MARIADB_ALLOW_EMPTY_ROOT_PASSWORD` | ルートユーザーのパスワードなしを許可 | なし |
+| `MYSQL_RANDOM_ROOT_PASSWORD` | `MARIADB_RANDOM_ROOT_PASSWORD` | ルートユーザーのパスワードをランダム生成 | なし |
+| `MYSQL_ROOT_HOST` | `MARIADB_ROOT_HOST` | ルートユーザーの接続を許可するホスト名 | `localhost` |
+| `MYSQL_TCP_PORT` | `MARIADB_TCP_PORT` | データベースに接続するポート番号 | `3306` |
+| `MYSQL_DATABASE` | `MARIADB_DATABASE` | 自動生成するデータベース名 | なし |
+| `MYSQL_INITDB_SKIP_TZINFO` | `MARIADB_INITDB_SKIP_TZINFO` | TZテーブルの初期化をスキップ | なし |
+| `MYSQL_USER` | `MARIADB_USER` | 一般ユーザーを作成 | なし |
+| `MYSQL_PASSWORD` | `MARIADB_PASSWORD` | 一般ユーザーのパスワード | なし |
+| `MYSQL_LOG_CONSOLE` | `MARIADB_LOG_CONSOLE` | エラーログを標準出力に設定 | なし |
+| | `MARIADB_AUTO_UPGRADE` | データベースの自動アップグレードを実行 | `no` |
+| | `MARIADB_DISABLE_UPGRADE_BACKUP` | アップグレード時のバックアップ作成を無効化 | `no` |
+| | `MARIADB_CREATE_DATABASE_IF_NOT_EXISTS` | `MARIADB_DATABASE`の設定がない場合でもデータベースを作成 | `no` |
+
+- MySQLとMariaDBは基本的に同じ環境変数を設定できます
+  - MariaDBには追加機能があります
+  - MariaDB独自の環境変数はMySQLでは利用できません
+- 環境変数のプレフィクスはそれぞれ`MYSQL_`と`MARIADB_`です
+  - MySQLの環境変数は基本的にMariaDBでも動作します
 
 ## 起動
 
