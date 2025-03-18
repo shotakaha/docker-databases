@@ -5,6 +5,9 @@ docker compose mariadb
 ## イメージ
 
 - https://hub.docker.com/_/mariadb
+- https://hub.docker.com/_/mysql
+
+MariaDBもMySQLも公式イメージがあるので、そちらを使えばOKです。
 
 ## 環境変数
 
@@ -34,14 +37,25 @@ docker compose mariadb
 
 ```console
 $ docker compose up -d
-docker compose up -d
 [+] Running 2/2
  ✔ Network docker-mariadb_default  Created
  ✔ Container docker-mariadb-db-1   Started
 ```
 
 `docker compose up`でコンテナを起動します。
-このとき`-d`オプション（デタチモード）をつけます。
+このとき`-d`オプション（デタッチモード）をつけます。
+
+## ログを確認
+
+```console
+$ docker compose logs
+...
+db-1  | 2025-03-18 14:10:39 0 [Note] mariadbd: ready for connections.
+db-1  | Version: '10.11.11-MariaDB-ubu2204'  socket: '/run/mysqld/mysqld.sock'  port: 3306  mariadb.org binary distribution
+```
+
+デタッチモードで起動した場合でも
+`docker compose logs`を使ってコンテナが吐き出した標準出力を確認できます。
 
 ## 作業パスの確認
 
@@ -150,3 +164,46 @@ $ docker compose cp db:/workspace/backup.sql .
 `mariadb-dump`もしくは`mysqldump`を使って、データベースをダンプします。
 上記のサンプルでは、作業パスにバックアップを作成し、
 `docker compose cp`でホストに転送しています。
+
+## エントリーポイントの設定
+
+```yaml
+services:
+  db:
+    image: madiadb:10.11
+    volumes:
+      - ./backups/:/docker-entrypoint-initdb.d/
+```
+
+MariaDBやMySQLなどのデータベース系の公式イメージでは、
+`/docker-entrypoint-initdb.d/`の中にあるファイルを
+コンテナ起動時に読み込むようなエントリーポイントが設定されています。
+
+`.sql`や`.sql.gz`はデータベースを初期化するのに使われます
+`.sh`ファイルも`bash`で処理されます。
+
+ここではホストPCの`./backups/`を、
+`/docker-entrypoint-initdb.d`にマウントすることで、
+こちらで用意したデータベースで初期化できるようにしてあります。
+
+```console
+$ docker compose up -d
+$ docker compose exec db bash
+
+[root@random]# mysql -u root -p
+password:    # rootpassと入力
+
+MariaDB [(none)]> SHOW DATABASES;
+MariaDB [(none)]> USE testdb;
+MariaDB [testdb]> SHOW TABLES;
+MariaDB [testdb]> \q
+Bye
+[root@random]# exit
+
+$ docker compose down -v
+```
+
+`/docker-entrypoint-initdb.d/`は、
+データベースがないときだけ初期化に利用されます。
+毎回、データベースをリセットする場合は、
+コンテナ終了時に`-v`をつけてボリュームを削除する必要があります。
