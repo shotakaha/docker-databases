@@ -1,15 +1,28 @@
 # docker-mariadb
 
-docker compose mariadb
+docker compose mariadb/mysql + adminer
 
-## イメージ
+## Usage
+
+```console
+$ docker compose up -d
+$ open http://localhost:8080
+$ docker compose down -v
+```
+
+- `MariaDB`（もしくは`MySQL`）コンテナと`Adminer`コンテナを起動します
+- `http://localhost:8080`で`Adminer`アプリにアクセスし、データベースを操作します
+- コンテナ終了時にはボリュームを削除します
+
+## Used images
 
 - https://hub.docker.com/_/mariadb
 - https://hub.docker.com/_/mysql
+- https://hub.docker.com/_/adminer
 
-MariaDBもMySQLも公式イメージがあるので、そちらを使えばOKです。
+- Docker Hubにある公式イメージを使用します
 
-## 環境変数
+## Environments
 
 | MySQL | MariaDB | 説明 | デフォルト値 |
 |---|---|---|---|
@@ -27,35 +40,134 @@ MariaDBもMySQLも公式イメージがあるので、そちらを使えばOKで
 | | `MARIADB_DISABLE_UPGRADE_BACKUP` | アップグレード時のバックアップ作成を無効化 | `no` |
 | | `MARIADB_CREATE_DATABASE_IF_NOT_EXISTS` | `MARIADB_DATABASE`の設定がない場合でもデータベースを作成 | `no` |
 
-- MySQLとMariaDBは基本的に同じ環境変数を設定できます
+- MySQLとMariaDBは基本的に同じ環境変数を利用できます
   - MariaDBには追加機能があります
   - MariaDB独自の環境変数はMySQLでは利用できません
 - 環境変数のプレフィクスはそれぞれ`MYSQL_`と`MARIADB_`です
   - MySQLの環境変数は基本的にMariaDBでも動作します
 
-## 起動
+## コンテナを起動する
 
 ```console
 $ docker compose up -d
-[+] Running 2/2
- ✔ Network docker-mariadb_default  Created
- ✔ Container docker-mariadb-db-1   Started
+[+] Running 4/4
+ ✔ Network docker-mariadb_default      Created
+ ✔ Volume "docker-mariadb_db_data"     Created
+ ✔ Container docker-mariadb-adminer-1  Started
+ ✔ Container docker-mariadb-db-1       Started
 ```
 
-`docker compose up`でコンテナを起動します。
-このとき`-d`オプション（デタッチモード）をつけます。
+`docker compose up -d`で`MariaDB`コンテナと`Adminer`コンテナを起動します。
+起動時には`-d`オプション（デタッチモード）を使用します。
 
-## ログを確認
+## ログを確認する
 
 ```console
 $ docker compose logs
 ...
 db-1  | 2025-03-18 14:10:39 0 [Note] mariadbd: ready for connections.
 db-1  | Version: '10.11.11-MariaDB-ubu2204'  socket: '/run/mysqld/mysqld.sock'  port: 3306  mariadb.org binary distribution
+
+$ docker compose logs adminer
+adminer-1  | [Tue Mar 18 22:41:10 2025] PHP 8.4.5 Development Server (http://[::]:8080) started
+adminer-1  | [Tue Mar 18 22:42:52 2025] [::ffff:192.168.65.1]:49820 Accepted
+adminer-1  | [Tue Mar 18 22:42:52 2025] [::ffff:192.168.65.1]:49820 [200]: GET /
+adminer-1  | [Tue Mar 18 22:42:52 2025] [::ffff:192.168.65.1]:49820 Closing
 ```
 
 デタッチモードで起動した場合でも
-`docker compose logs`を使ってコンテナが吐き出した標準出力を確認できます。
+`docker compose logs コンテナ名`で標準出力のログを確認できます。
+コンテナ名を指定するとコンテナごとのログを取得できます。
+
+## データベースを初期化する
+
+```yaml
+services:
+  db:
+    image: madiadb:10.11
+    volumes:
+      - ./backups/:/docker-entrypoint-initdb.d/
+```
+
+エントリーポイントを利用してデータベースを初期化します。
+MariaDBやMySQLなどのデータベース系の公式イメージでは、
+コンテナの起動時に`/docker-entrypoint-initdb.d/`の中にある
+ファイルを読み込むように設定されています。
+
+対象となるファイルは`.sql`や`.sql.gz`、`.sh`です。
+複数のファイルがある場合はABC順に読み込まれます。
+この仕様を利用して、ファイル名に数字の接頭辞をつけることで読み込む順番を制御できます。
+
+この`compose.yaml`の設定では
+ホストPCの`./backups/`の中にデータベースを保存することを前提に、
+`/docker-entrypoint-initdb.d`にマウントしています。
+
+注意点として、この処理はコンテナ内にデータベースがないときだけ実行されます。
+そのためボリュームを永続化している場合は、事前に削除しておく必要があります。
+
+## データベースを確認する
+
+`http://localhost:8080`で`Adminer`コンテナに接続します。
+もしくは、下記のように`db`コンテナに接続し、直接操作することもできます。
+
+## データベースに接続する
+
+```console
+// コンテナを起動する
+$ docker compose up -d
+
+// コンテナに接続しbashを起動する
+$ docker compose exec db bash
+
+// データベースに接続する
+[root@random:/workspace]# mariadb -u testuser -D testdb -p
+Enter password:    # testpassと入力
+Server version: 10.11.11-MariaDB-ubu2204 mariadb.org binary distribution
+
+MariaDB [testdb]> show databases;
++--------------------+
+| Database           |
++--------------------+
+| information_schema |
+| testdb             |
++--------------------+
+2 rows in set (0.001 sec)
+
+MariaDB [testdb]> use testdb;
+Database changed
+
+MariaDB [testdb]> show tables;
++-----------------------------------+
+| Tables_in_testdb                  |
++-----------------------------------+
+| カラム名                           |
+| .......                           |
++-----------------------------------+
+139 rows in set (0.001 sec)
+
+MariaDB [testdb]> \q
+Bye
+
+// コンテナからログアウトする
+[root@random:/workspace]# exit
+
+// コンテナを終了する
+$ docker compose down -v
+```
+
+`docker compose exec db bash`でコンテナのbashを起動します。
+あとはコンテナ内でデータベースを操作をします。
+
+データベースに接続する時は、環境変数の
+`MARIADB_USER`、
+`MARIADB_DATABASE`、
+`MARIADB_PASSWORD`
+に設定した値を入力します。
+
+コンテナを終了するときは`-v`オプションで
+ボリュームを削除します。
+
+---
 
 ## 作業パスの確認
 
@@ -165,45 +277,4 @@ $ docker compose cp db:/workspace/backup.sql .
 上記のサンプルでは、作業パスにバックアップを作成し、
 `docker compose cp`でホストに転送しています。
 
-## エントリーポイントの設定
 
-```yaml
-services:
-  db:
-    image: madiadb:10.11
-    volumes:
-      - ./backups/:/docker-entrypoint-initdb.d/
-```
-
-MariaDBやMySQLなどのデータベース系の公式イメージでは、
-`/docker-entrypoint-initdb.d/`の中にあるファイルを
-コンテナ起動時に読み込むようなエントリーポイントが設定されています。
-
-`.sql`や`.sql.gz`はデータベースを初期化するのに使われます
-`.sh`ファイルも`bash`で処理されます。
-
-ここではホストPCの`./backups/`を、
-`/docker-entrypoint-initdb.d`にマウントすることで、
-こちらで用意したデータベースで初期化できるようにしてあります。
-
-```console
-$ docker compose up -d
-$ docker compose exec db bash
-
-[root@random]# mysql -u root -p
-password:    # rootpassと入力
-
-MariaDB [(none)]> SHOW DATABASES;
-MariaDB [(none)]> USE testdb;
-MariaDB [testdb]> SHOW TABLES;
-MariaDB [testdb]> \q
-Bye
-[root@random]# exit
-
-$ docker compose down -v
-```
-
-`/docker-entrypoint-initdb.d/`は、
-データベースがないときだけ初期化に利用されます。
-毎回、データベースをリセットする場合は、
-コンテナ終了時に`-v`をつけてボリュームを削除する必要があります。
