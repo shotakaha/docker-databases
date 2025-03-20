@@ -2,6 +2,24 @@
 
 docker compose databases
 
+```console
+$ tree -L 2 .
+.
+├── LICENSE
+├── README.md
+├── mariadb_adminer
+│   ├── README.md
+│   └── compose.yaml
+├── mysql_adminer
+│   ├── README.md
+│   └── compose.yaml
+└── postgres_adminer
+    ├── README.md
+    └── compose.yaml
+
+4 directories, 8 files
+```
+
 ## Examples
 
 - [MariaDB + Adminer](./mariadb_adminer/README.md)
@@ -15,17 +33,18 @@ Database Management Tools
 
 ## Usage
 
+1. Select a combination of database and management tool
+2. Copy the `compose.yaml` to your directory
+3. Edit the `compose.yaml` as needed
+4. Run `docker compose up -d` to start services
+5. Open `http://localhost:8080` to manage databases via management tool
+6. Run `docker compose down -v` to stop services and delete volumes
+
 ```console
 $ docker compose up -d
 $ open http://localhost:8080
 $ docker compose down -v
 ```
-
-- `MariaDB`（もしくは`MySQL`）コンテナと`Adminer`コンテナを起動します
-- `http://localhost:8080`で`Adminer`アプリにアクセスし、データベースを操作します
-- コンテナ終了時にはボリュームを削除します
-
-
 
 ## Environments
 
@@ -62,7 +81,8 @@ $ docker compose up -d
  ✔ Container docker-mariadb-db-1       Started
 ```
 
-`docker compose up -d`で`MariaDB`コンテナと`Adminer`コンテナを起動します。
+`docker compose up -d`で`compose.yaml`で設定したサービスを起動します。
+データベース用のコンテナと、データベース管理ツールのコンテナが起動し、お互いに通信できるようになります。
 起動時には`-d`オプション（デタッチモード）を使用します。
 
 ## ログを確認する
@@ -80,9 +100,8 @@ adminer-1  | [Tue Mar 18 22:42:52 2025] [::ffff:192.168.65.1]:49820 [200]: GET /
 adminer-1  | [Tue Mar 18 22:42:52 2025] [::ffff:192.168.65.1]:49820 Closing
 ```
 
-デタッチモードで起動した場合でも
-`docker compose logs コンテナ名`で標準出力のログを確認できます。
-コンテナ名を指定するとコンテナごとのログを取得できます。
+`docker compose logs`で起動したサービスの標準出力のログを確認できます。
+`docker compose logs コンテナ名`でコンテナ名を指定することもできます。
 
 ## データベースを初期化する
 
@@ -94,8 +113,8 @@ services:
       - ./backups/:/docker-entrypoint-initdb.d/
 ```
 
-エントリーポイントを利用してデータベースを初期化します。
-MariaDBやMySQLなどのデータベース系の公式イメージでは、
+データベース用コンテナの`entrypoint`を利用してデータベースを初期化できます。
+データベース用コンテナの公式イメージでは、
 コンテナの起動時に`/docker-entrypoint-initdb.d/`の中にある
 ファイルを読み込むように設定されています。
 
