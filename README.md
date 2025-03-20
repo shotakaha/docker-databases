@@ -1,8 +1,8 @@
-# docker-mariadb
+# docker-database
 
-docker compose mariadb/mysql + adminer
+docker compose databases
 
-## Images
+## Examples
 
 - [MariaDB + Adminer](./mariadb_adminer/README.md)
 - [MySQL + Adminer](./mysql_adminer/README.md)
