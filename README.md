@@ -7,29 +7,23 @@ $ tree -L 2 .
 .
 ├── LICENSE
 ├── README.md
-├── mariadb_adminer
+├── mariadb/
+│   ├── README.md
+│   ├── backups/
+│   └── compose.yaml
+├── mariadb_adminer/
+│   ├── README.md
+│   ├── backups/
+│   └── compose.yaml
+├── mysql_adminer/
 │   ├── README.md
 │   └── compose.yaml
-├── mysql_adminer
-│   ├── README.md
-│   └── compose.yaml
-└── postgres_adminer
+└── postgres_adminer/
     ├── README.md
     └── compose.yaml
 
-4 directories, 8 files
+7 directories, 10 files
 ```
-
-## Examples
-
-- [MariaDB + Adminer](./mariadb_adminer/README.md)
-- [MySQL + Adminer](./mysql_adminer/README.md)
-- [PostgreSQL + Adminer](./postgres_adminer/README.md)
-
-Database Management Tools
-
-- Adminer: https://hub.docker.com/_/adminer
-- phpMyAdmin: https://hub.docker.com/_/phpmyadmin
 
 ## Usage
 
@@ -37,14 +31,47 @@ Database Management Tools
 2. Copy the `compose.yaml` to your directory
 3. Edit the `compose.yaml` as needed
 4. Run `docker compose up -d` to start services
-5. Open `http://localhost:8080` to manage databases via management tool
-6. Run `docker compose down -v` to stop services and delete volumes
+5. Run `docker compose down -v` to stop services and delete volumes
+
+## Examples
+
+- [MariaDB](./mariadb/README.md)
+- (TBA) MySQL
+- (TBA) PostgreSQL
+
+### Use services
+
+```console
+$ docker compose up -d
+$ docker compose exec db bash
+$ docker compose down -v
+```
+
+1. Run `docker compose exec db bash` to login the contaner (named `db`)
+2. Run database commands directly inside the container
+
+## Examples with DB Management Tools
+
+- [MariaDB + Adminer](./mariadb_adminer/README.md)
+- [MySQL + Adminer](./mysql_adminer/README.md)
+- [PostgreSQL + Adminer](./postgres_adminer/README.md)
+- (TBA) MariaDB + phpMyAdmin
+- (TBA) MySQL + phpMyAdmin
+
+### Use services
 
 ```console
 $ docker compose up -d
 $ open http://localhost:8080
 $ docker compose down -v
 ```
+
+1. Open browser to use DB management tools
+2. Operate DB using web-based client
+
+---
+
+# More details
 
 ## Environments
 
