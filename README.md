@@ -73,6 +73,20 @@ $ docker compose down -v
 
 # More details
 
+## Entrypoint
+
+```yaml
+volumes:
+  - ./backups/:/docker-entrypoint-initdb.d/
+```
+
+- Dockerの`entrypoint`機能で、データベースを初期化できます。
+- データベース系のイメージは`/docker-entrypoint-initdb.d/`に配置されたSQLファイルを、データベースの初期化に使用します。
+- この`compose.yaml`のサンプルでは、ホストの`./backups/`に配置したファイルを、コンテナにバインドマウントします
+- 対象となるファイルは`.sql`や`.sql.gz`、`.sh`です。
+- 複数のファイルがある場合はABC順に読み込まれます。この仕様を利用して、ファイル名に数字の接頭辞をつけることで読み込む順番を制御できます。
+- 注意点として、この初期化の処理はコンテナ内にデータベースがないときだけ実行されます。そのためボリュームを永続化している場合は、事前に削除しておく必要があります。
+
 ## Environments
 
 | MySQL | MariaDB | 説明 | デフォルト値 |
