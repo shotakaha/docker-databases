@@ -1,0 +1,15 @@
+services:
+  db:
+    image: mariadb:10.11
+    working_dir: /workspace
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpass
+      MYSQL_DATABASE: testdb
+      MYSQL_USER: testuser
+      MYSQL_PASSWORD: testpass
+    volumes:
+      - db_data:/var/lib/mysql
+      - ./backups/:/docker-entrypoint-initdb.d/
+      
+volumes:
+  db_data:
